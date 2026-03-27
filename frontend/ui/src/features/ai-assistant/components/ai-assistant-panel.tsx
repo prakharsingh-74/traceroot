@@ -15,9 +15,10 @@ import { getProject, getAvailableLLMModels } from "@/lib/api";
 interface AiAssistantPanelProps {
   open: boolean;
   onClose: () => void;
+  initialContext?: { traceId?: string; traceSessionId?: string } | null;
 }
 
-export function AiAssistantPanel({ open, onClose }: AiAssistantPanelProps) {
+export function AiAssistantPanel({ open, onClose, initialContext }: AiAssistantPanelProps) {
   const { width, onMouseDown } = usePanelResize();
   const params = useParams();
   const projectId = params?.projectId as string | undefined;
@@ -56,13 +57,17 @@ export function AiAssistantPanel({ open, onClose }: AiAssistantPanelProps) {
     handleOpenHistory,
     handleSelectSession,
     handleDeleteSession,
-  } = useAiChat({ projectId });
+  } = useAiChat({
+    projectId,
+    traceId: initialContext?.traceId,
+    traceSessionId: initialContext?.traceSessionId,
+  });
 
   if (!open) return null;
 
   return (
     <div
-      className="relative flex h-screen shrink-0 flex-col border-l bg-background"
+      className="relative z-[60] flex h-screen shrink-0 flex-col border-l bg-background"
       style={{ width }}
     >
       {/* Left resize handle */}

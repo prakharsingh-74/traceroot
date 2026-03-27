@@ -12,6 +12,10 @@ interface LayoutContextType {
   setSidebarCollapsed: (collapsed: boolean) => void;
   headerContent: ReactNode;
   setHeaderContent: (content: ReactNode) => void;
+  aiPanelOpen: boolean;
+  setAiPanelOpen: (open: boolean) => void;
+  aiContext: { traceId?: string; traceSessionId?: string } | null;
+  setAiContext: (context: { traceId?: string; traceSessionId?: string } | null) => void;
 }
 
 const LayoutContext = createContext<LayoutContextType>({
@@ -19,6 +23,10 @@ const LayoutContext = createContext<LayoutContextType>({
   setSidebarCollapsed: () => {},
   headerContent: null,
   setHeaderContent: () => {},
+  aiPanelOpen: false,
+  setAiPanelOpen: () => {},
+  aiContext: null,
+  setAiContext: () => {},
 });
 
 export function useLayout() {
@@ -29,6 +37,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [headerContent, setHeaderContent] = useState<ReactNode>(null);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
+  const [aiContext, setAiContext] = useState<{ traceId?: string; traceSessionId?: string } | null>(
+    null,
+  );
   const pathname = usePathname();
 
   // Don't show layout on auth pages
@@ -43,6 +54,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         setSidebarCollapsed,
         headerContent,
         setHeaderContent,
+        aiPanelOpen,
+        setAiPanelOpen,
+        aiContext,
+        setAiContext,
       }}
     >
       <div className="flex h-screen">
@@ -73,7 +88,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </header>
           <main className="flex-1 overflow-hidden">{children}</main>
         </div>
-        <AiAssistantPanel open={aiPanelOpen} onClose={() => setAiPanelOpen(false)} />
+        <AiAssistantPanel
+          open={aiPanelOpen}
+          initialContext={aiContext}
+          onClose={() => {
+            setAiPanelOpen(false);
+            setAiContext(null);
+          }}
+        />
       </div>
     </LayoutContext.Provider>
   );

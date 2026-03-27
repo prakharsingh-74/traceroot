@@ -12,10 +12,12 @@ import {
   Users,
   Clock,
   ChevronRight,
+  BotMessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExpandableSection } from "@/components/ui/expandable-section";
 import { useSession } from "@/features/traces/hooks";
+import { useLayout } from "@/components/layout/app-layout";
 import { ContentRenderer } from "./ContentRenderer";
 import { formatDuration, cn, buildUrlWithFilters } from "@/lib/utils";
 import { toTimestampBounds } from "@/lib/date-filter";
@@ -91,6 +93,7 @@ export function SessionDetailPanel({
   customEndDate,
 }: SessionDetailPanelProps) {
   const router = useRouter();
+  const { setAiPanelOpen, setAiContext } = useLayout();
 
   // Compute timestamps from date filter props
   const sessionQueryOptions = useMemo(() => {
@@ -160,6 +163,23 @@ export function SessionDetailPanel({
                 <span className="font-medium">{formatDuration(data.duration_ms)}</span>
               </div>
             )}
+            <div className="flex-1" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary"
+              onClick={() => {
+                const firstTraceId = data.traces[0]?.trace_id;
+                setAiContext({
+                  traceId: firstTraceId,
+                  traceSessionId: sessionId,
+                });
+                setAiPanelOpen(true);
+              }}
+            >
+              <BotMessageSquare className="h-4 w-4" />
+              Agent
+            </Button>
           </div>
           {data.user_ids.length > 0 && (
             <div className="mt-2 flex flex-wrap items-center gap-2">
